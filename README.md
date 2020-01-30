@@ -16,18 +16,15 @@ repo：https://github.com/daiquocnguyen/ConvKB
 
 
 #### 数据处理：   
-**input_data：**  
-从neo4j私有数据导出后，处理好的实体、关系、三元组编号。   
-格式为：   
-头实体编号 尾实体编号 关系编号   
-entity2id/xxx2id   
-neo4j_id 编号 relation2id  
-or关系名称 编号   
-ISKG_maintain.csv 是从neo4j中导出的，见数据处理。movies.csv是一个简单的domo格式示例。   
+**data：**  
+1. 从neo4j私有数据导出ISKG_maintain.csv，处理为 (头实体编号 尾实体编号 关系编号) 格式。  
+2. data/input_data_0126和0128都是相同的数据源，只是在分test/valid的时候有些区别，code见数据预处理文件夹。  
+3. valid2id.txt，从ISKG_maintain.csv导出的三元组编号，csv中的实体id时neo4j中id，对该id排序后从0-n重新编号，见entity2id。关系按照中文从0-n编号，见relation2id。  
+4. 1-1.txt,1-n.txt,n-1.txt,n-n.txt，type_constrain.txt使用n-n.py产出，\*-\*.txt为test2id.txt中关系类别，type_constrain描述关系两边可出现哪些实体，可用于thunlp负例替换使用。  
 **graph.db：**   
 neo4j私有数据备份，下载neo4j community版本可导入。   
 导入方法：可下载neo4j desktop，方便管理、安装apoc插件 http://neo4j.com.cn/topic/59c27adf1f16d3b94d3274c6    
-**neo4j维修服务部分导出csv**  
+**neo4j维修服务部分导出csv，cypher语句：**  
 match(n:实例节点:维修服务)-[r]->(m:实例节点:维修服务)   
 where not n:智能头盔 and not m:智能头盔   
 with collect(distinct n) as heads, collect(distinct m) as tails, collect(r) as rels   
@@ -37,3 +34,9 @@ RETURN file, source, format, nodes, relationships, properties, time, rows, batch
 
 #### 补充论文：   
 https://weizhixiaoyi.com/paper.html
+
+#### thunlp的repo：  
+https://github.com/thunlp/OpenKE
+
+#### 腾讯文档：  
+https://docs.qq.com/doc/DQm1DQXh0bGZXSEVG
