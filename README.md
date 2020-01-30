@@ -27,7 +27,7 @@ ISKG_maintain.csv 是从neo4j中导出的，见数据处理。movies.csv是一�
 **graph.db：**   
 neo4j私有数据备份，下载neo4j community版本可导入。   
 导入方法：可下载neo4j desktop，方便管理、安装apoc插件 http://neo4j.com.cn/topic/59c27adf1f16d3b94d3274c6    
-neo4j维修服务部分导出csv
+**neo4j维修服务部分导出csv**  
 match(n:实例节点:维修服务)-[r]->(m:实例节点:维修服务)   
 where not n:智能头盔 and not m:智能头盔   
 with collect(distinct n) as heads, collect(distinct m) as tails, collect(r) as rels   
