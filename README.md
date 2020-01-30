@@ -30,7 +30,7 @@ where not n:智能头盔 and not m:智能头盔
 with collect(distinct n) as heads, collect(distinct m) as tails, collect(r) as rels   
 CALL apoc.export.csv.data(heads+tails, rels, "ISKG_maintain.csv", {})   
 YIELD file, source, format, nodes, relationships, properties, time, rows, batchSize, batches, done, data   
-RETURN file, source, format, nodes, relationships, properties, time, rows, batchSize, batches, done, data 注：这个cypher语句导出的数据，因为(h, r, t) (t, x, y)，t可能出现两次，所有在数据处理时实体要去重。 处理为：input_data格式 python处理代码见input_data/preteat.ipynb
+RETURN file, source, format, nodes, relationships, properties, time, rows, batchSize, batches, done, data 注：这个cypher语句导出的数据，因为(h, r, t) (t, x, y)，t可能出现两次，数据处理时实体要去重。 
 
 #### 补充论文：   
 https://weizhixiaoyi.com/paper.html
