@@ -1,7 +1,7 @@
 # ISKG
 intelligent service knowledge graph project
 
-相关业务资料：
+#### 相关业务资料：
 XX智能服务的知识图谱抽取和存储文档v1.3.1.docx
 XX智能服务的知识图谱模型设计文档v3.1.docx
 
