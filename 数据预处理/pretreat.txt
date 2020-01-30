@@ -1,0 +1,429 @@
+#%%
+
+import pandas as pd
+# import csv
+_path = 'C:/Users/lxabc/Desktop/ISKG资料/input_data/ISKG_maintain.csv'
+t = pd.read_csv(_path, sep=',', encoding='utf-8')
+# dtype={'_id':np.int32, '_start':np.int32, '_end':np.int32}
+t['_id'] = t['_id'].astype(pd.Int32Dtype())
+t['_start'] = t['_start'].astype(pd.Int32Dtype())
+t['_end'] = t['_end'].astype(pd.Int32Dtype())
+# t.head(3)
+
+
+#%%
+
+# split to entites and relations
+_idx = t['_start'].first_valid_index()
+print(_idx)
+entities = t[:_idx]
+rels = t[_idx:]
+# entities.tail(3)
+# rels.head(3)
+# entities.iloc[_idx-1] use[] not ()
+
+#%%
+
+# entities drop duplicates
+entities = entities.sort_values(by='_id', ascending=True)
+entities = entities.drop_duplicates()
+# entities.head(20)
+
+#%%
+
+# 实体编码，把实体的_id，重新从0-n编码，并存为字典
+entities.reset_index(drop=True, inplace=True)
+# entities.head(20)
+ids = entities['_id']
+id_dict = ids.to_dict() # (no., _id)
+id_dict = dict(zip(id_dict.values(), id_dict.keys())) # (_id, no.)
+# id_dict.items()
+
+#%%
+
+# 独立的关系编码，存为字典
+rels = rels[['_start', '_end', '_type']]
+# rels.shape[0]
+unique_rels = rels['_type'].drop_duplicates()
+unique_rels.reset_index(drop=True, inplace=True)
+rels_dict = dict(zip(unique_rels.to_dict().values(), unique_rels.to_dict().keys()))
+rels_dict.items()
+
+#%%
+
+# 替换三元组的实体和关系为编号
+rels1 = rels
+# for k in rels_dict.keys():
+#     rels.loc[rels['_type']==k] = rels_dict[k]
+rels1['_type'] = rels1['_type'].apply(lambda x: rels_dict[x])
+# rels1['_type'].unique()
+
+#%%
+
+rels1['_start'] = rels1['_start'].apply(lambda x: id_dict[x])
+rels1['_end'] = rels1['_end'].apply(lambda x: id_dict[x])
+rels1.head(10)
+
+#%%
+
+_p = 'C:/Users/lxabc/Desktop/input_data/'
+# 存entity2id
+efile = open(_p+'entity2id.txt', 'w')
+efile.write(str(len(id_dict))+'\n')
+for k,v in id_dict.items():
+    efile.write(str(k)+'\t'+str(v)+'\n')
+efile.close()
+
+# 存relation2id
+rfile = open(_p+'relation2id.txt', 'w')
+rfile.write(str(len(rels_dict))+'\n')
+for k,v in rels_dict.items():
+    rfile.write(str(k)+'\t'+str(v)+'\n')
+rfile.close()
+
+# 存三元组
+tfile = open(_p+'triple2id.txt', 'w')
+tfile.write(str(rels1.shape[0])+'\n')
+tfile.close()
+rels1.to_csv(_p+'triple2id.txt', sep='\t', header=False,index=False, mode='a')
+
+
+#%%
+
+# 切分三元组数据
+
+#%%
+
+# 切分valid、test数据集
+# 可视化关系类型的分布
+import numpy as np
+import matplotlib as mpl
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas as pd
+%matplotlib inline
+
+_path = 'C:/Users/lxabc/Desktop/实验结果/input_data_0128/triple2id.txt'
+t = pd.read_csv(_path, sep='\t', header=None, names=['head', 'tail', 'rel'], encoding='utf-8'
+                ,dtype=np.int32, skiprows=1) # skiprows, skip前n行，或者[0, n...]skip第几行
+
+#%%
+
+# 把关系分类，转为字典
+cntvals = t['rel'].value_counts()
+pltval = cntvals.to_dict()
+
+#%%
+
+# 关系直方图，带具体数值显示
+# pltval.items()
+s = sns.countplot(x='rel', data=t)
+for k,v in pltval.items():
+    s.text(k, v+0.05, v, ha='center', va= 'bottom',fontsize=8)
+
+
+#%%
+
+# 分类抽取测试集，抽20%
+from sklearn.model_selection import StratifiedShuffleSplit
+# random_state 可以调整，可以去掉
+# iloc是行位置，而loc是dataframe的行index, train_index/test_index返回的是行位置，用iloc
+sp = StratifiedShuffleSplit(n_splits = 1,test_size = 0.2,random_state = 1)
+for train_index, test_index in sp.split(t, t['rel']):
+    trainds = t.iloc[train_index]
+    tvds = t.iloc[test_index]
+
+#%%
+
+# tvds中，若三元组中有一个元素未在train中出现，放回train
+t_ents = trainds['head'].append(trainds['tail']) # 在series中检索会有问题，用unique是准确的
+t_entuni = t_ents.unique()
+t_rels = trainds['rel']
+t_reluni = trainds['rel'].unique()
+
+idxlist = []
+for idx, row in tvds.iterrows():
+    if row['head'] not in t_entuni or row['tail'] not in t_entuni:
+        idxlist.append(idx)
+# 不满足条件的三元组放回训练集
+trainds = trainds.append(tvds.loc[idxlist])
+tvds.drop(index=idxlist, inplace=True)
+
+#%%
+
+trainds = trainds.sample(frac=1).reset_index(drop=True)
+tvds = tvds.sample(frac=1).reset_index(drop=True)
+
+#%%
+
+# tvds划分valid和test
+spt = StratifiedShuffleSplit(n_splits = 1,test_size = 0.4,random_state = 0)
+for test_index, valid_index in spt.split(tvds, tvds['rel']):
+    testds = tvds.iloc[test_index]
+    validds = tvds.iloc[valid_index]
+
+#%%
+
+# 保存train/valid/test数据集
+_p = 'C:/Users/lxabc/Desktop/实验结果/input_data_0128/'
+trfile = open(_p+'train2id.txt', 'w')
+trfile.write(str(trainds.shape[0])+'\n')
+trfile.close()
+trainds.to_csv(_p+'train2id.txt', sep='\t', header=False,index=False, mode='a')
+
+vafile = open(_p+'valid2id.txt', 'w')
+vafile.write(str(validds.shape[0])+'\n')
+vafile.close()
+validds.to_csv(_p+'valid2id.txt', sep='\t', header=False,index=False, mode='a')
+
+tsfile = open(_p+'test2id.txt', 'w')
+tsfile.write(str(testds.shape[0])+'\n')
+tsfile.close()
+testds.to_csv(_p+'test2id.txt', sep='\t', header=False,index=False, mode='a')
+
+
+
+#%%
+
+# 数据集分析
+# FB15K237
+import pandas as pd
+import numpy as np
+import seaborn as sns
+%matplotlib inline
+_path = 'C:/Users/lxabc/Desktop/OpenKE/benchmarks/FB15K237/'
+train = pd.read_csv(_path+'train2id.txt', sep=' ', header=None, names=['head', 'tail', 'rel'], 
+                    encoding='utf-8',dtype=np.int32, skiprows=1)
+
+#%%
+
+import matplotlib.pyplot as plt
+def histogram(t, addTe=True, big=False, save=False, path=None):
+    if big:
+        plt.figure(figsize=(20, 6))
+        plt.xticks(rotation=-90)
+        #plt.tick_params(axis='x', labelsize=8) 
+    s = sns.countplot(x='rel', data=t)
+    if addTe:
+        cntvals = t['rel'].value_counts()
+        pltval = cntvals.to_dict()
+        pltval = {k:pltval[k] for k in sorted(pltval.keys())}
+        i=0
+        for k,v in pltval.items():
+            s.text(i, v+0.05, v, ha='center', va= 'bottom',fontsize=8)
+            i+=1
+    if save:
+        plt.savefig(path)
+        
+
+#%%
+
+histogram(t=train, addTe=False, big=True, save=True, path = 'C:/Users/lxabc/Desktop/ISKG实验/FB15K237-trainrel.png')
+
+#%%
+
+test = pd.read_csv(_path+'test2id.txt', sep=' ', header=None, names=['head', 'tail', 'rel'], 
+                    encoding='utf-8',dtype=np.int32, skiprows=1)
+valid = pd.read_csv(_path+'valid2id.txt', sep=' ', header=None, names=['head', 'tail', 'rel'], 
+                    encoding='utf-8',dtype=np.int32, skiprows=1)
+
+#%%
+
+histogram(t=test, addTe=False, big=True, save=True, path='C:/Users/lxabc/Desktop/ISKG实验/FB15K237-testrel.png')
+histogram(t=valid, addTe=False, big=True, save=True, path='C:/Users/lxabc/Desktop/ISKG实验/FB15K237-validrel.png')
+
+#%%
+
+a = train['rel'].value_counts()
+b = test['rel'].value_counts()
+c = valid['rel'].value_counts()
+
+#%%
+
+# 判断train/test/valid中是否有重复
+de = train.append(test, ignore_index=True)
+du = de.duplicated()
+du[du.values==True].index
+
+#%%
+
+_path = 'C:/Users/lxabc/Desktop/OpenKE/benchmarks/FB15K237/'
+# 1-1, 1-n, n-1, n-n分析
+a11 = pd.read_csv(_path+'1-1.txt', sep=' ', header=None, names=['head', 'tail', 'rel'], 
+                    encoding='utf-8',dtype=np.int32, skiprows=1)
+a1n = pd.read_csv(_path+'1-n.txt', sep=' ', header=None, names=['head', 'tail', 'rel'], 
+                    encoding='utf-8',dtype=np.int32, skiprows=1)
+an1 = pd.read_csv(_path+'n-1.txt', sep=' ', header=None, names=['head', 'tail', 'rel'], 
+                    encoding='utf-8',dtype=np.int32, skiprows=1)
+ann = pd.read_csv(_path+'n-n.txt', sep=' ', header=None, names=['head', 'tail', 'rel'], 
+                    encoding='utf-8',dtype=np.int32, skiprows=1)
+
+#%%
+
+histogram(t=a11, addTe=False,save=True, path = 'C:/Users/lxabc/Desktop/ISKG实验/FB15K237-a11rel.png')
+
+#%%
+
+histogram(t=a1n, addTe=False, big=True, save=True, path = 'C:/Users/lxabc/Desktop/ISKG实验/FB15K237-a1nrel.png')
+
+#%%
+
+histogram(t=an1, addTe=False, big=True, save=True, path = 'C:/Users/lxabc/Desktop/ISKG实验/FB15K237-an1rel.png')
+
+#%%
+
+histogram(t=ann, addTe=False, big=True, save=True, path = 'C:/Users/lxabc/Desktop/ISKG实验/FB15K237-annrel.png')
+
+#%%
+
+# WN18RR
+import pandas as pd
+import numpy as np
+import seaborn as sns
+%matplotlib inline
+_path = 'C:/Users/lxabc/Desktop/OpenKE/benchmarks/WN18RR/'
+train = pd.read_csv(_path+'train2id.txt', sep=' ', header=None, names=['head', 'tail', 'rel'], 
+                    encoding='utf-8',dtype=np.int32, skiprows=1)
+test = pd.read_csv(_path+'test2id.txt', sep=' ', header=None, names=['head', 'tail', 'rel'], 
+                    encoding='utf-8',dtype=np.int32, skiprows=1)
+valid = pd.read_csv(_path+'valid2id.txt', sep=' ', header=None, names=['head', 'tail', 'rel'], 
+                    encoding='utf-8',dtype=np.int32, skiprows=1)
+
+#%%
+
+histogram(t=train, addTe=True, save=True, path = 'C:/Users/lxabc/Desktop/ISKG实验/WN18RR-trainrel.png')
+
+#%%
+
+histogram(t=test, addTe=True, save=True, path = 'C:/Users/lxabc/Desktop/ISKG实验/WN18RR-testrel.png')
+
+#%%
+
+histogram(t=valid, addTe=True, save=True, path = 'C:/Users/lxabc/Desktop/ISKG实验/WN18RR-validrel.png')
+
+#%%
+
+# 判断train/test/valid中是否有重复
+de = train.append(valid, ignore_index=True)
+du = de.duplicated()
+du[du.values==True].index
+
+#%%
+
+# 1-1, 1-n, n-1, n-n分析
+a11 = pd.read_csv(_path+'1-1.txt', sep=' ', header=None, names=['head', 'tail', 'rel'], 
+                    encoding='utf-8',dtype=np.int32, skiprows=1)
+a1n = pd.read_csv(_path+'1-n.txt', sep=' ', header=None, names=['head', 'tail', 'rel'], 
+                    encoding='utf-8',dtype=np.int32, skiprows=1)
+an1 = pd.read_csv(_path+'n-1.txt', sep=' ', header=None, names=['head', 'tail', 'rel'], 
+                    encoding='utf-8',dtype=np.int32, skiprows=1)
+ann = pd.read_csv(_path+'n-n.txt', sep=' ', header=None, names=['head', 'tail', 'rel'], 
+                    encoding='utf-8',dtype=np.int32, skiprows=1)
+
+#%%
+
+histogram(t=a11, addTe=True, save=True, path = 'C:/Users/lxabc/Desktop/ISKG实验/WN18RR-a11rel.png')
+
+#%%
+
+histogram(t=a1n, addTe=True, save=True, path = 'C:/Users/lxabc/Desktop/ISKG实验/WN18RR-a1nrel.png')
+
+#%%
+
+histogram(t=an1, addTe=True, save=True, path = 'C:/Users/lxabc/Desktop/ISKG实验/WN18RR-an1rel.png')
+
+#%%
+
+histogram(t=ann, addTe=True, save=True, path = 'C:/Users/lxabc/Desktop/ISKG实验/WN18RR-annrel.png')
+
+#%%
+
+# ISKG分析
+import pandas as pd
+import numpy as np
+import seaborn as sns
+%matplotlib inline
+_path = 'C:/Users/lxabc/Desktop/ISKG实验/input_data_0126/'
+train = pd.read_csv(_path+'train2id.txt', sep='\t', header=None, names=['head', 'tail', 'rel'], 
+                    encoding='utf-8',dtype=np.int32, skiprows=1)
+test = pd.read_csv(_path+'test2id.txt', sep='\t', header=None, names=['head', 'tail', 'rel'], 
+                    encoding='utf-8',dtype=np.int32, skiprows=1)
+valid = pd.read_csv(_path+'valid2id.txt', sep='\t', header=None, names=['head', 'tail', 'rel'], 
+                    encoding='utf-8',dtype=np.int32, skiprows=1)
+
+
+#%%
+
+histogram(t=train, addTe=True, save=True, path = 'C:/Users/lxabc/Desktop/ISKG实验/ISKG-trainrel.png')
+
+#%%
+
+histogram(t=test, addTe=True, save=True, path = 'C:/Users/lxabc/Desktop/ISKG实验/ISKG-testrel.png')
+
+#%%
+
+histogram(t=valid, addTe=True, save=True, path = 'C:/Users/lxabc/Desktop/ISKG实验/ISKG-validrel.png')
+
+#%%
+
+# 1-1, 1-n, n-1, n-n分析
+a11 = pd.read_csv(_path+'1-1.txt', sep='\t', header=None, names=['head', 'tail', 'rel'], 
+                    encoding='utf-8',dtype=np.int32, skiprows=1)
+a1n = pd.read_csv(_path+'1-n.txt', sep='\t', header=None, names=['head', 'tail', 'rel'], 
+                    encoding='utf-8',dtype=np.int32, skiprows=1)
+an1 = pd.read_csv(_path+'n-1.txt', sep='\t', header=None, names=['head', 'tail', 'rel'], 
+                    encoding='utf-8',dtype=np.int32, skiprows=1)
+ann = pd.read_csv(_path+'n-n.txt', sep='\t', header=None, names=['head', 'tail', 'rel'], 
+                    encoding='utf-8',dtype=np.int32, skiprows=1)
+
+#%%
+
+histogram(t=a11, addTe=True, save=True, path = 'C:/Users/lxabc/Desktop/ISKG实验/ISKG-a11rel.png')
+
+#%%
+
+histogram(t=a1n, addTe=True, save=True, path = 'C:/Users/lxabc/Desktop/ISKG实验/ISKG-a1nrel.png')
+
+#%%
+
+histogram(t=an1, addTe=True, save=True, path = 'C:/Users/lxabc/Desktop/ISKG实验/ISKG-an1rel.png')
+
+#%%
+
+histogram(t=ann, addTe=True, save=True, path = 'C:/Users/lxabc/Desktop/ISKG实验/ISKG-annrel.png')
+
+#%%
+
+# FB15K237 valid/train构造分析
+import pandas as pd
+import numpy as np
+_path = 'C:/Users/lxabc/Desktop/OpenKE/benchmarks/FB15K237/'
+trainds = pd.read_csv(_path+'train2id.txt', sep=' ', header=None, names=['head', 'tail', 'rel'], 
+                    encoding='utf-8',dtype=np.int32, skiprows=1)
+validds = pd.read_csv(_path+'valid2id.txt', sep=' ', header=None, names=['head', 'tail', 'rel'], 
+                    encoding='utf-8',dtype=np.int32, skiprows=1)
+testds = pd.read_csv(_path+'test2id.txt', sep=' ', header=None, names=['head', 'tail', 'rel'], 
+                    encoding='utf-8',dtype=np.int32, skiprows=1)
+
+t_ents = trainds['head'].append(trainds['tail']) # 在series中检索会有问题，用unique是准确的
+t_entuni = t_ents.unique()
+t_rels = trainds['rel']
+t_reluni = trainds['rel'].unique()
+
+#%%
+
+heads = trainds['head'].unique()
+tails = trainds['tail'].unique()
+
+#%%
+
+i=0
+for idx, row in testds.iterrows():
+    if row['head'] not in heads or row['tail'] not in tails: #or row['rel'] not in t_reluni:
+        print(row['head'], row['tail'])
+        i+=1
+print(i)
+
+#%%
+# "属于"关系分析
+# 
