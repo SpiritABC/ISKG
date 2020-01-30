@@ -23,11 +23,11 @@ repo：https://github.com/daiquocnguyen/ConvKB
 entity2id/xxx2id   
 neo4j_id 编号 relation2id  
 or关系名称 编号   
-ISKG_maintain.csv 是从neo4j中导出的，见数据处理。movies.csv是一个简单的domo格式示例。
+ISKG_maintain.csv 是从neo4j中导出的，见数据处理。movies.csv是一个简单的domo格式示例。   
 **graph.db：**   
 neo4j私有数据备份，下载neo4j community版本可导入。   
-导入方法：可下载neo4j desktop，方便管理、安装apoc插件 http://neo4j.com.cn/topic/59c27adf1f16d3b94d3274c6
-**导出维修服务相关的知识图谱到csv**  
+导入方法：可下载neo4j desktop，方便管理、安装apoc插件 http://neo4j.com.cn/topic/59c27adf1f16d3b94d3274c6    
+###### 导出维修服务相关的知识图谱到csv  
 match(n:实例节点:维修服务)-[r]->(m:实例节点:维修服务)   
 where not n:智能头盔 and not m:智能头盔   
 with collect(distinct n) as heads, collect(distinct m) as tails, collect(r) as rels   
