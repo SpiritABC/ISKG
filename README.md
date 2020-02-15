@@ -44,6 +44,6 @@ https://github.com/xhuang31/KEQA_WSDM19
 
 #### 腾讯文档：  
 图谱embedding文档  
-https://docs.qq.com/doc/DQm1DQXh0bGZXSEVG
+https://docs.qq.com/doc/DQm1DQXh0bGZXSEVG  
 图谱问答文档  
 https://docs.qq.com/doc/DQlZDWld3Vk1yTGF0
