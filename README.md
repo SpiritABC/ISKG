@@ -21,6 +21,7 @@ repo：https://github.com/daiquocnguyen/ConvKB
 2.data/input_data_0126和0128都是相同的数据源，只是在分test/valid的时候有些区别，code见数据预处理文件夹。  
 3.valid2id.txt，从ISKG_maintain.csv导出的三元组编号，csv中的实体id时neo4j中id，对该id排序后从0-n重新编号，见entity2id。关系按照中文从0-n编号，见relation2id。  
 4.1-1.txt,1-n.txt,n-1.txt,n-n.txt，type_constrain.txt使用n-n.py产出，\*-\*.txt为test2id.txt中关系类别，type_constrain描述关系两边可出现哪些实体，可用于thunlp负例替换使用。  
+5.目前用的**数据集是data/input0202_bs**, 其中entity2vec是entity2id对应训练好的向量，relation2vec同理。
 **graph.db：**   
 neo4j私有数据备份，下载neo4j community版本可导入。   
 导入方法：可下载neo4j desktop，方便管理、安装apoc插件 http://neo4j.com.cn/topic/59c27adf1f16d3b94d3274c6    
