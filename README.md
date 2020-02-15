@@ -38,5 +38,11 @@ https://weizhixiaoyi.com/paper.html
 #### thunlp的repo：  
 https://github.com/thunlp/OpenKE
 
+#### 基于图谱embedding的问答：
+https://github.com/xhuang31/KEQA_WSDM19
+
 #### 腾讯文档：  
+图谱embedding文档  
 https://docs.qq.com/doc/DQm1DQXh0bGZXSEVG
+图谱问答文档  
+https://docs.qq.com/doc/DQlZDWld3Vk1yTGF0
