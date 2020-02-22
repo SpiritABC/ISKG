@@ -9,10 +9,11 @@
 
 
 
+1. when running for the first time, run preparation script with: $ sh prepare.sh
 
-1. python create_dataset_files.py // if already created, skip
+2. python create_dataset_files.py // if already created, skip
 
-2. python main.py --data ./data/ISKG/ --epochs_gat 100 --epochs_conv 100 --weight_decay_gat 0.00001 --get_2hop True --partial_2hop True --batch_size_gat 1024 --margin 1 --out_channels 50 --drop_conv 0.3 --output_folder ./checkpoints/fb/out/
+3. python main.py --data ./data/ISKG_50/ --epochs_gat 100 --epochs_conv 100 --weight_decay_gat 0.00001 --get_2hop True --partial_2hop True --batch_size_gat 1024 --margin 1 --out_channels 50 --drop_conv 0.3 --output_folder ./checkpoints/fb/out/
 
 
 

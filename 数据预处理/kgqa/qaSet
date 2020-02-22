@@ -1,0 +1,561 @@
+# 1. 将QAnote每个文件作为输入
+# 2. 对每个文件，自定义可能出现的n种问法
+# 3. 拼接问题，生成标注的问题集，保存到QAnoted
+# 4. 拼接所有文件，形成最后的问答数据集
+import pandas as pd
+import numpy as np
+import math
+_path = 'C:/Users/lxabc/Desktop/QAdata/QAname/'
+_path_o ='C:/Users/lxabc/Desktop/QAdata/QAnoted/'
+
+def annotate(tri, qes):
+    div = int(math.ceil(len(tri) / len(qes)))
+    i = 0
+    for idx, row in tri.iterrows():
+        row['qes'] = qes[int(i / div)].replace('xx', row['s'])
+        i += 1
+    return tri
+
+# 挖掘机
+doc = '挖掘机'
+tri = pd.read_csv(_path+doc+'.txt', sep='\t', header=None, names=['s', 'p', 'o','stype', 'otype']
+                  , encoding='utf-8', dtype=np.str)
+tri['qes'] = None
+# print(tri['otype'].value_counts())
+print(tri['otype'].unique())
+listType = tri['otype'].unique()
+gzzl = tri[tri['otype'].isin([listType[0]])]
+jx = tri[tri['otype'].isin([listType[1]])]
+pp = tri[tri['otype'].isin([listType[2]])]
+dqszdq = tri[tri['otype'].isin([listType[3]])]
+dj = tri[tri['otype'].isin([listType[4]])]
+gzms = tri[tri['otype'].isin([listType[5]])]
+gd = tri[tri['otype'].isin([listType[6]])]
+zbzt = tri[tri['otype'].isin([listType[7]])]
+kh = tri[tri['otype'].isin([listType[8]])]
+# 挖掘机 用工属性 工作种类 可能的问题：
+# 1. 挖掘机xx的工作种类是什么
+# 2. 挖掘机xx属于哪种工作种类
+# 3. 挖掘机xx是哪种工作种类的
+# 4. 机号为xx的挖掘机的工作种类是什么
+# 5. 机号为xx的挖掘机属于哪种工作种类
+# 6. 机号为xx的挖掘机是哪种工作种类
+# 7. xx的工作种类是什么
+# 8. xx属于哪种工作种类
+# 9. xx是哪种工作种类的
+qes = ['挖掘机xx的工作种类是什么', '挖掘机xx属于哪种工作种类', '挖掘机xx是哪种工作种类的', '机号为xx的挖掘机的工作种类是什么',
+       '机号为xx的挖掘机属于哪种工作种类', '机号为xx的挖掘机是哪种工作种类', 'xx的工作种类是什么',
+       'xx属于哪种工作种类', 'xx是哪种工作种类的']
+gzzl = annotate(gzzl, qes)
+# 挖掘机 机器属性 机型 可能的问题:
+# 1. 挖掘机xx属于什么机型
+# 2. 挖掘机xx属于哪种机型
+# 3. 挖掘机xx是哪种机型的
+# 4. 挖掘机xx的机型是哪种
+# 5. 挖掘机xx的机型是什么
+# 6. 机号为xx的挖掘机属于什么机型
+# 7. 机号为xx的挖掘机属于哪种机型
+# 8. 机号为xx的挖掘机是哪种机型的
+# 9. 机号为xx的挖掘机的机型是哪种
+# 10. 机号为xx的挖掘机的机型是什么
+# 11. xx属于什么机型
+# 12. xx属于哪种机型
+# 13. xx是哪种机型的
+# 14. xx的机型是哪种
+# 15. xx的机型是什么
+qes = ['挖掘机xx属于什么机型', '挖掘机xx属于哪种机型', '挖掘机xx是哪种机型的', '挖掘机xx的机型是哪种','挖掘机xx的机型是什么',
+       '机号为xx的挖掘机属于什么机型', '机号为xx的挖掘机属于哪种机型', '机号为xx的挖掘机是哪种机型的', '机号为xx的挖掘机的机型是哪种',
+       '机号为xx的挖掘机的机型是什么', 'xx属于什么机型', 'xx属于哪种机型', 'xx是哪种机型的', 'xx的机型是哪种', 'xx的机型是什么']
+jx = annotate(jx, qes)
+# 挖掘机 机器属性 品牌 可能的问题:
+# 1. 挖掘机xx的品牌是什么
+# 2. 挖掘机xx属于什么品牌
+# 3. 挖掘机xx属于哪种品牌
+# 4. 挖掘机xx是哪种品牌的
+# 5. 挖掘机xx是什么品牌的
+# 6. 挖掘机xx的品牌是哪种
+# 7. 机号为xx的挖掘机的品牌是什么
+# 8. 机号为xx的挖掘机属于什么品牌
+# 9. 机号为xx的挖掘机属于哪种品牌
+# 10. 机号为xx的挖掘机是哪种品牌的
+# 11. 机号为xx的挖掘机是什么品牌的
+# 12. 机号为xx的挖掘机的品牌是哪种
+# 13. xx的品牌是什么
+# 14. xx属于什么品牌
+# 15. xx属于哪种品牌
+# 16. xx是哪种品牌的
+# 17. xx是什么品牌的
+# 18. xx的品牌是哪种
+qes = ['挖掘机xx的品牌是什么', '挖掘机xx属于什么品牌', '挖掘机xx属于哪种品牌', '挖掘机xx是哪种品牌的',
+       '挖掘机xx是什么品牌的', '挖掘机xx的品牌是哪种', '机号为xx的挖掘机的品牌是什么', '机号为xx的挖掘机属于什么品牌',
+       '机号为xx的挖掘机属于哪种品牌', '机号为xx的挖掘机是哪种品牌的', '机号为xx的挖掘机是什么品牌的',
+       '机号为xx的挖掘机的品牌是哪种', 'xx的品牌是什么', 'xx属于什么品牌', 'xx属于哪种品牌', 'xx是哪种品牌的',
+       'xx是什么品牌的', 'xx的品牌是哪种']
+pp = annotate(pp, qes)
+# 挖掘机 位置 当前所在地区 可能的问题:
+# 1. 挖掘机xx的位置在哪
+# 2. 挖掘机xx在哪个位置
+# 3. 挖掘机xx的当前所在地区是哪
+# 4. 挖掘机xx在哪
+# 5. 挖掘机xx在哪个地区
+# 6. 挖掘机xx当前在哪
+# 7. 挖掘机xx当前在哪个地区
+# 8. 挖掘机xx当前的位置在哪
+# 9. 挖掘机xx当前在哪个位置
+# 10. 机号为xx的挖掘机的位置在哪
+# 11. 机号为xx的挖掘机在哪个位置
+# 12. 机号为xx的挖掘机的当前所在地区是哪
+# 13. 机号为xx的挖掘机在哪
+# 14. 机号为xx的挖掘机在哪个地区
+# 15. 机号为xx的挖掘机当前在哪
+# 16. 机号为xx的挖掘机当前在哪个地区
+# 17. 机号为xx的挖掘机当前的位置在哪
+# 18. 机号为xx的挖掘机当前在哪个位置
+# 19. xx的位置在哪
+# 20. xx在哪个位置
+# 21. xx当前所在地区是哪
+# 22. xx在哪
+# 23. xx在哪个地区
+# 24. xx当前在哪
+# 25. xx当前在哪个地区
+# 26. xx当前的位置在哪
+# 27. xx当前在哪个位置
+qes = ['挖掘机xx的位置在哪', '挖掘机xx在哪个位置', '挖掘机xx的当前所在地区是哪', '挖掘机xx在哪', '挖掘机xx在哪个地区',
+       '挖掘机xx当前在哪', '挖掘机xx当前在哪个地区', '挖掘机xx当前的位置在哪', '挖掘机xx当前在哪个位置',
+       '机号为xx的挖掘机的位置在哪', '机号为xx的挖掘机在哪个位置', '机号为xx的挖掘机的当前所在地区是哪', '机号为xx的挖掘机在哪'
+       '机号为xx的挖掘机在哪个地区', '机号为xx的挖掘机当前在哪', '机号为xx的挖掘机当前在哪个地区', '机号为xx的挖掘机当前的位置在哪',
+       '机号为xx的挖掘机当前在哪个位置', 'xx的位置在哪', 'xx在哪个位置', 'xx当前所在地区是哪', 'xx在哪', 'xx在哪个地区',
+       'xx当前在哪', 'xx当前在哪个地区', 'xx当前的位置在哪', 'xx当前在哪个位置']
+dqszdq = annotate(dqszdq, qes)
+# 挖掘机 机器属性 吨级 可能的问题:
+# 1. 挖掘机xx的吨级是多少
+# 2. 挖掘机xx是多少吨级的
+# 3. 挖掘机xx的吨级是什么
+# 4. 挖掘机xx是什么吨级的
+# 5. 挖掘机xx属于多少吨级
+# 6. 挖掘机xx属于什么吨级
+# 7. 机号为xx的挖掘机的吨级是多少
+# 8. 机号为xx的挖掘机是多少吨级的
+# 9. 机号为xx的挖掘机的吨级是什么
+# 10. 机号为xx的挖掘机是什么吨级的
+# 11. 机号为xx的挖掘机属于多少吨级
+# 12. 机号为xx的挖掘机属于什么吨级
+# 13. xx的吨级是多少
+# 14. xx是多少吨级的
+# 15. xx的吨级是什么
+# 16. xx是什么吨级的
+# 17. xx属于多少吨级
+# 18. xx属于什么吨级
+qes = ['挖掘机xx的吨级是多少', '挖掘机xx是多少吨级的', '挖掘机xx的吨级是什么', '挖掘机xx是什么吨级的', '挖掘机xx属于多少吨级',
+       '挖掘机xx属于什么吨级', '机号为xx的挖掘机的吨级是多少', '机号为xx的挖掘机是多少吨级的', '机号为xx的挖掘机的吨级是什么',
+       '机号为xx的挖掘机是什么吨级的', '机号为xx的挖掘机属于多少吨级', '机号为xx的挖掘机属于什么吨级', 'xx的吨级是多少',
+       'xx是多少吨级的', 'xx的吨级是什么', 'xx是什么吨级的', 'xx属于多少吨级', 'xx属于什么吨级']
+dj = annotate(dj, qes)
+# 挖掘机 具有 故障描述 可能的问题:
+# 1. 挖掘机xx具有的故障描述是什么
+# 2. 挖掘机xx具有什么故障描述
+# 3. 挖掘机xx有什么故障描述
+# 4. 挖掘机xx有什么故障
+# 5. 挖掘机xx的故障描述是什么
+# 6. 挖掘机xx的故障是什么
+# 7. 机号为xx的挖掘机具有的故障描述是什么
+# 8. 机号为xx的挖掘机具有什么故障描述
+# 9. 机号为xx的挖掘机有什么故障描述
+# 10. 机号为xx的挖掘机有什么故障
+# 11. 机号为xx的挖掘机的故障描述是什么
+# 12. 机号为xx的挖掘机的故障是什么
+# 13. xx具有的故障描述是什么
+# 14. xx具有什么故障描述
+# 15. xx有什么故障描述
+# 16. xx有什么故障
+# 17. xx的故障描述是什么
+# 18. xx的故障是什么
+qes = ['挖掘机xx具有的故障描述是什么', '挖掘机xx具有什么故障描述', '挖掘机xx有什么故障描述', '挖掘机xx有什么故障',
+       '挖掘机xx的故障描述是什么', '挖掘机xx的故障是什么', '机号为xx的挖掘机具有的故障描述是什么', '机号为xx的挖掘机具有什么故障描述',
+       '机号为xx的挖掘机有什么故障描述', '机号为xx的挖掘机有什么故障', '机号为xx的挖掘机的故障描述是什么',
+       '机号为xx的挖掘机的故障是什么', 'xx具有的故障描述是什么', 'xx具有什么故障描述', 'xx有什么故障描述', 'xx有什么故障',
+       'xx的故障描述是什么', 'xx的故障是什么']
+gzms = annotate(gzms, qes)
+# 挖掘机 产生 工单 可能的问题:
+# 1. 挖掘机xx产生的工单号是多少
+# 2. 挖掘机xx产生的工单是什么
+# 3. 挖掘机xx产生的工单是哪个
+# 4. 挖掘机xx产生的是哪个工单
+# 5. 机号为xx的挖掘机产生的工单号是多少
+# 6. 机号为xx的挖掘机产生的工单是什么
+# 7. 机号为xx的挖掘机产生的工单是哪个
+# 8. 机号为xx的挖掘机产生的是哪个工单
+# 9. xx产生的工单号是多少
+# 10. xx产生的工单是什么
+# 11. xx产生的工单是哪个
+# 12. xx产生的是哪个工单
+qes = ['挖掘机xx产生的工单号是多少', '挖掘机xx产生的工单是什么', '挖掘机xx产生的工单是哪个', '挖掘机xx产生的是哪个工单',
+       '机号为xx的挖掘机产生的工单号是多少', '机号为xx的挖掘机产生的工单是什么', '机号为xx的挖掘机产生的工单是哪个',
+       '机号为xx的挖掘机产生的是哪个工单', 'xx产生的工单号是多少', 'xx产生的工单是什么','xx产生的工单是哪个', 'xx产生的是哪个工单']
+gd = annotate(gd, qes)
+# 挖掘机 用工属性 质保状态 可能的问题:
+# 1. 挖掘机xx的质保状态是什么
+# 2. 挖掘机xx属于哪种质保状态
+# 3. 挖掘机xx的质保状态是哪种
+# 4. 挖掘机xx是哪种质保状态
+# 5. 机号为xx的挖掘机的质保状态是什么
+# 6. 机号为xx的挖掘机属于哪种质保状态
+# 7. 机号为xx的挖掘机的质保状态是哪种
+# 8. 机号为xx的挖掘机是哪种质保状态
+# 9. xx的质保状态是什么
+# 10. xx属于哪种质保状态
+# 11. xx的质保状态是哪种
+# 12. xx是哪种质保状态
+qes = ['挖掘机xx的质保状态是什么', '挖掘机xx属于哪种质保状态', '挖掘机xx的质保状态是哪种', '挖掘机xx是哪种质保状态',
+       '机号为xx的挖掘机的质保状态是什么', '机号为xx的挖掘机属于哪种质保状态', '机号为xx的挖掘机的质保状态是哪种',
+       '机号为xx的挖掘机是哪种质保状态', 'xx的质保状态是什么', 'xx属于哪种质保状态','xx的质保状态是哪种', 'xx是哪种质保状态']
+zbzt = annotate(zbzt, qes)
+# 挖掘机 所有权 客户 可能的问题:
+# 1. 挖掘机xx的所有权是哪个客户的
+# 2. 挖掘机xx的所有权归哪个客户
+# 3. 挖掘机xx是哪个客户的
+# 4. 挖掘机xx被哪个客户所有
+# 5. 挖掘机xx属于哪个客户
+# 6. 机号为xx的挖掘机的所有权是哪个客户的
+# 7. 机号为xx的挖掘机的所有权归哪个客户
+# 8. 机号为xx的挖掘机是哪个客户的
+# 9. 机号为xx的挖掘机被哪个客户所有
+# 10. 机号为xx的挖掘机属于哪个客户
+# 11. xx的所有权是哪个客户的
+# 12. xx的所有权归哪个客户
+# 13. xx是哪个客户的
+# 14. xx被哪个客户所有
+# 15. xx属于哪个客户
+qes = ['挖掘机xx的所有权是哪个客户的', '挖掘机xx的所有权归哪个客户', '挖掘机xx是哪个客户的', '挖掘机xx被哪个客户所有',
+       '挖掘机xx属于哪个客户', '机号为xx的挖掘机的所有权是哪个客户的', '机号为xx的挖掘机的所有权归哪个客户',
+       '机号为xx的挖掘机是哪个客户的', '机号为xx的挖掘机被哪个客户所有', '机号为xx的挖掘机属于哪个客户', 'xx的所有权是哪个客户的',
+       'xx的所有权归哪个客户', 'xx是哪个客户的', 'xx被哪个客户所有', 'xx属于哪个客户']
+kh = annotate(kh, qes)
+tri_n = pd.concat([gzzl, jx, pp, dqszdq, dj, gzms, gd, zbzt, kh])
+print(len(tri))
+print(len(tri_n))
+tri_n.to_csv(_path_o+doc+'noted.txt', sep='\t', header=False,index=False, encoding='utf_8_sig')
+
+
+
+# # 工单
+# doc = '工单'
+# tri = pd.read_csv(_path+doc+'.txt', sep='\t', header=None, names=['s', 'p', 'o','stype', 'otype']
+#                   , encoding='utf-8', dtype=np.str)
+# tri['qes'] = None
+# # print(tri['otype'].value_counts())
+# print(tri['otype'].unique())
+# listType = tri['otype'].unique()
+# dqgdzt = tri[tri['otype'].isin([listType[0]])]
+# zyxt = tri[tri['otype'].isin([listType[1]])]
+# gzms = tri[tri['otype'].isin([listType[2]])]
+# ckd = tri[tri['otype'].isin([listType[3]])]
+# fwpg = tri[tri['otype'].isin([listType[4]])]
+# fa = tri[tri['otype'].isin([listType[5]])]
+# # 工单 处于 当前工单状态 可能的问题：
+# 1. 工单xx处于什么状态
+# 2. 工单xx当前处于什么状态
+# 3. 工单xx处于什么工单状态
+# 4. 工单xx的状态是什么
+# 5. 工单xx的工单状态是什么
+# 6. 工单xx的当前状态是什么
+# 7. 工单xx的当前工单状态是什么
+# 8. xx处于什么状态
+# 9. xx当前处于什么状态
+# 10. xx处于什么工单状态
+# 11. xx的状态是什么
+# 12. xx的工单状态是什么
+# 13. xx的当前状态是什么
+# 14. xx的当前工单状态是什么
+# qes = ['工单xx处于什么状态', '工单xx当前处于什么状态', '工单xx处于什么工单状态', '工单xx的状态是什么', '工单xx的工单状态是什么',
+#        '工单xx的当前状态是什么', '工单xx的当前工单状态是什么', 'xx处于什么状态', 'xx当前处于什么状态', 'xx处于什么工单状态',
+#        'xx的状态是什么', 'xx的工单状态是什么', 'xx的当前状态是什么', 'xx的当前工单状态是什么']
+# dqgdzt = annotate(dqgdzt, qes)
+# # 工单 属于 作业形态 可能的问题:
+# 1. 工单xx属于什么作业形态
+# 2. 工单xx属于哪种作业形态
+# 3. 工单xx的作业形态是什么
+# 4. 工单xx的作业形态是哪种
+# 5. xx属于什么作业形态
+# 6. xx属于哪种作业形态
+# 7. xx的作业形态是什么
+# 8. xx的作业形态是哪种
+# qes = ['工单xx属于什么作业形态', '工单xx属于哪种作业形态', '工单xx的作业形态是什么', '工单xx的作业形态是哪种',
+#        'xx属于什么作业形态', 'xx属于哪种作业形态', 'xx的作业形态是什么', 'xx的作业形态是哪种']
+# zyxt = annotate(zyxt, qes)
+# # 工单 处理 故障描述 可能的问题:
+# 1. 工单xx处理的故障是什么
+# 2. 工单xx处理的故障描述是什么
+# 3. 工单xx处理什么故障
+# 4. 工单xx处理的是什么故障
+# 5. xx处理的故障是什么
+# 6. xx处理的故障描述是什么
+# 7. xx处理什么故障
+# 8. xx处理的是什么故障
+# qes = ['工单xx处理的故障是什么', '工单xx处理的故障描述是什么', '工单xx处理什么故障', '工单xx处理的是什么故障',
+#        'xx处理的故障是什么', 'xx处理的故障描述是什么', 'xx处理什么故障', 'xx处理的是什么故障']
+# gzms = annotate(gzms, qes)
+# # 工单 对应 出库单 可能的问题:
+# 1. 工单xx对应的出库单是哪个
+# 2. 工单xx对应哪个出库单
+# 3. 工单xx对应的出库单号是多少
+# 4. 工单xx对应哪个出库单号
+# 5. 工单xx对应的出库单是多少
+# 6. xx对应的出库单是哪个
+# 7. xx对应哪个出库单
+# 8. xx对应的出库单号是多少
+# 9. xx对应哪个出库单号
+# 10. xx对应的出库单是多少
+# qes = ['工单xx对应的出库单是哪个', '工单xx对应哪个出库单', '工单xx对应的出库单号是多少', '工单xx对应哪个出库单号',
+#        '工单xx对应的出库单是多少', 'xx对应的出库单是哪个', 'xx对应哪个出库单', 'xx对应的出库单号是多少',
+#        'xx对应哪个出库单号', 'xx对应的出库单是多少']
+# ckd = annotate(ckd, qes)
+# # 工单 对应 服务派工 可能的问题:
+# 1. 工单xx对应的服务派工是哪个
+# 2. 工单xx对应哪个服务派工
+# 3. 工单xx对应的服务派工号是多少
+# 4. 工单xx对应哪个服务派工号
+# 5. xx对应的服务派工是哪个
+# 6. xx对应哪个服务派工
+# 7. xx对应的服务派工号是多少
+# 8. xx对应哪个服务派工号
+# qes = ['工单xx对应的服务派工是哪个', '工单xx对应哪个服务派工', '工单xx对应的服务派工号是多少', '工单xx对应哪个服务派工号',
+#        'xx对应的服务派工是哪个', 'xx对应哪个服务派工', 'xx对应的服务派工号是多少', 'xx对应哪个服务派工号']
+# fwpg = annotate(fwpg, qes)
+# # 工单 包含 方案 可能的问题:
+# 1. 工单xx包含什么方案
+# 2. 工单xx包含的方案是什么
+# 3. 工单xx的方案是什么
+# 4. 工单xx有什么方案
+# 5. xx包含什么方案
+# 6. xx包含的方案是什么
+# 7. xx的方案是什么
+# 8. xx有什么方案
+# qes = ['工单xx包含什么方案', '工单xx包含的方案是什么', '工单xx的方案是什么', '工单xx有什么方案',
+#        'xx包含什么方案', 'xx包含的方案是什么', 'xx的方案是什么', 'xx有什么方案']
+# fa = annotate(fa, qes)
+# tri_n = pd.concat([dqgdzt, zyxt, gzms, ckd, fwpg, fa])
+# print(len(tri))
+# print(len(tri_n))
+# tri_n.to_csv(_path_o+doc+'noted.txt', sep='\t', header=False,index=False, encoding='utf_8_sig')
+
+
+
+# # 客户
+# doc = '客户'
+# tri = pd.read_csv(_path+doc+'.txt', sep='\t', header=None, names=['s', 'p', 'o','stype', 'otype']
+#                   , encoding='utf-8', dtype=np.str)
+# tri['qes'] = None
+# # print(tri['otype'].value_counts())
+# print(tri['otype'].unique())
+# listType = tri['otype'].unique()
+# lx = tri[tri['otype'].isin([listType[0]])]
+# dj = tri[tri['otype'].isin([listType[1]])]
+# lxr = tri[tri['otype'].isin([listType[2]])]
+# # 客户 客户属性 客户类型 可能的问题：
+# 1. xx是什么类型的客户
+# 2. xx是什么类型
+# 3. xx客户是什么类型
+# 4. xx客户的客户类型是什么
+# 5. 客户xx是什么类型的客户
+# 6. 客户xx是什么类型
+# 7. 客户xx的客户类型是什么
+# 8. 客户xx的类型是什么
+# 9. 客户xx是哪个类型
+# 10. xx是哪个类型
+# 11. xx是哪个类型的客户
+# qes = ['xx是什么类型的客户', 'xx是什么类型', 'xx客户是什么类型', 'xx客户的客户类型是什么', '客户xx是什么类型的客户',
+#        '客户xx是什么类型', '客户xx的客户类型是什么', '客户xx的类型是什么', '客户xx是哪个类型', 'xx是哪个类型', 'xx是哪个类型的客户']
+# lx = annotate(lx, qes)
+# # 客户 客户属性 客户等级 可能的问题:
+# 1. xx是什么等级的客户
+# 2. xx是什么等级
+# 3. xx客户是什么等级
+# 4. xx客户的客户等级是什么
+# 5. 客户xx是什么等级的客户
+# 6. 客户xx是什么等级
+# 7. 客户xx的客户等级是什么
+# 8. 客户xx的等级是什么
+# 9. 客户xx是哪个等级
+# 10. xx是哪个等级
+# 11. xx是哪个等级的客户
+# qes = ['xx是什么等级的客户', 'xx是什么等级', 'xx客户是什么等级', 'xx客户的客户等级是什么', '客户xx是什么等级的客户',
+#        '客户xx是什么等级', '客户xx的客户等级是什么', '客户xx的等级是什么', '客户xx是哪个等级', 'xx是哪个等级', 'xx是哪个等级的客户']
+# dj = annotate(dj, qes)
+# # 客户 具有 联系人 可能的问题:
+# 1. 客户xx具有的联系人是谁
+# 2. 客户xx的联系人是谁
+# 3. 客户xx的联系人是哪位
+# 4. 客户xx应该联系谁
+# 5. xx具有的联系人是谁
+# 6. xx的联系人是谁
+# 7. xx的联系人是哪位
+# 8. xx应该联系谁
+# qes = ['客户xx具有的联系人是谁', '客户xx的联系人是谁', '客户xx的联系人是哪位', '客户xx应该联系谁',
+#        'xx具有的联系人是谁', 'xx的联系人是谁', 'xx的联系人是哪位', 'xx应该联系谁']
+# lxr = annotate(lxr, qes)
+# tri_n = pd.concat([lx, dj, lxr])
+# print(len(tri))
+# print(len(tri_n))
+# tri_n.to_csv(_path_o+doc+'noted.txt', sep='\t', header=False,index=False, encoding='utf_8_sig')
+
+
+
+
+# # 现场服务人员
+# doc = '现场服务人员'
+# tri = pd.read_csv(_path+doc+'.txt', sep='\t', header=None, names=['s', 'p', 'o','stype', 'otype']
+#                   , encoding='utf-8', dtype=np.str)
+# tri['qes'] = None
+# print(tri['otype'].unique())
+# listType = tri['otype'].unique()
+# fwq = tri[tri['otype'].isin([listType[0]])]
+# jxfl = tri[tri['otype'].isin([listType[1]])]
+# bj = tri[tri['otype'].isin([listType[2]])]
+# zd = tri[tri['otype'].isin([listType[3]])]
+# fwry = tri[tri['otype'].isin([listType[4]])]
+# # 现场服务人员 隶属于 服务区 可能的问题：
+# 1. 现场服务人员xx隶属于哪个服务区
+# 2. xx隶属于哪个服务区
+# 3. 现场服务人员xx是哪个服务区的
+# 4. xx是哪个服务区的
+# qes = ['服务人员xx隶属于哪个服务区', 'xx隶属于哪个服务区', '服务人员xx是哪个服务区的', 'xx是哪个服务区的']
+# fwq = annotate(fwq, qes)
+# # 现场服务人员 培训过 机型分类 可能的问题:
+# 1. 现场服务人员xx培训过哪个机型分类
+# 2. xx培训过哪个机型分类
+# 3. 哪个机型分类现场服务人员xx培训过
+# 4. 哪个机型分类xx培训过
+# qes = ['现场服务人员xx培训过哪个机型分类', 'xx培训过哪个机型分类', '哪个机型分类现场服务人员xx培训过', '哪个机型分类xx培训过']
+# jxfl = annotate(jxfl, qes)
+# # 现场服务人员 培训过 部件 可能的问题:
+# 1. 现场服务人员xx培训过哪个部件
+# 2. xx培训过哪个部件
+# 3. 哪个部件现场服务人员xx培训过
+# 4. 哪个部件xx培训过
+# qes = ['现场服务人员xx培训过哪个部件', 'xx培训过哪个部件', '哪个部件现场服务人员xx培训过', '哪个部件xx培训过']
+# bj = annotate(bj, qes)
+# # 现场服务人员 驻扎在 驻点 可能的问题:
+# 1. 现场服务人员xx驻扎在哪个驻点
+# 2. xx驻扎在哪个驻点
+# 3. 现场服务人员xx驻扎在哪
+# 4. xx驻扎在哪
+# qes = ['现场服务人员xx驻扎在哪个驻点', 'xx驻扎在哪个驻点', '现场服务人员xx驻扎在哪', 'xx驻扎在哪']
+# zd = annotate(zd, qes)
+# # 现场服务人员 使用 服务人员使用车 可能的问题:
+# 1. 现场服务人员xx使用哪辆车
+# 2. xx使用哪辆车
+# 3. 现场服务人员用的车是哪辆
+# 4. xx用的车是哪辆
+# qes = ['现场服务人员xx使用哪辆车', 'xx使用哪辆车', '现场服务人员用的车是哪辆', 'xx用的车是哪辆']
+# fwry = annotate(fwry, qes)
+# tri_n = pd.concat([fwq, jxfl, bj, zd, fwry])
+# print(len(tri))
+# print(len(tri_n))
+# tri_n.to_csv(_path_o+doc+'noted.txt', sep='\t', header=False,index=False, encoding='utf_8_sig')
+
+# 机型分类
+# 机型分类 包含 机型分类 可能的问题：
+# 1. xx包含的机型分类是什么
+# 2. xx属于哪个机型分类
+# doc = '机型分类'
+# tri = pd.read_csv(_path+doc+'.txt', sep='\t', header=None, names=['s', 'p', 'o','stype', 'otype']
+#                   , encoding='utf-8', dtype=np.str)
+# qes = ['xx包含的机型分类是什么', 'xx属于哪个机型分类']
+# tri = tri.sample(frac=1.0)
+# tri['qes']=None
+# tri_n = tri.copy()
+# tri_n = annotate(tri_n, qes)
+# print(len(tri))
+# print(len(tri_n))
+# tri_n.to_csv(_path_o+doc+'noted.txt', sep='\t', header=False,index=False, encoding='utf_8_sig')
+
+# 服务派工
+# 服务派工 指派 现场服务人员 可能的问题：
+# 1. 派工单xx指派的现场服务人员是谁
+# 2. 派工单xx指定的现场服务人员是谁
+# 3. xx指派的现场服务人员是谁
+# 4. xx指定的现场服务人员是谁
+# 5. 谁是被xx派工单指派的
+# 6. 谁是被xx指派的
+# 7. 哪个现场服务人员是被xx派工单指派的
+# 8. 哪个现场服务人员是被xx指派的
+# doc = '服务派工'
+# tri = pd.read_csv(_path+doc+'.txt', sep='\t', header=None, names=['s', 'p', 'o','stype', 'otype']
+#                   , encoding='utf-8', dtype=np.str)
+# qes = ['派工单xx指派的现场服务人员是谁', '派工单xx指定的现场服务人员是谁', 'xx指派的现场服务人员是谁', 'xx指定的现场服务人员是谁'
+#        , '谁是被xx派工单指派的', '谁是被xx指派的', '哪个现场服务人员是被xx派工单指派的', '哪个现场服务人员是被xx指派的']
+# tri = tri.sample(frac=1.0)
+# tri['qes']=None
+# tri_n = tri.copy()
+# tri_n = annotate(tri_n, qes)
+# print(len(tri))
+# print(len(tri_n))
+# tri_n.to_csv(_path_o+doc+'noted.txt', sep='\t', header=False,index=False, encoding='utf_8_sig')
+
+
+# 业务前台
+# print(tri['otype'].unique()) # 工单
+# 业务前台 创建 工单 可能的问题：
+# 1. xx创建的工单号是多少
+# 2. xx建的工单号是多少
+# 3. xx创建的单号是多少
+# 4. xx建的单号是多少
+# 5. 业务前台xx创建的工单号是多少
+# 6. 业务前台xx建的工单号是多少
+# 7. 业务前台xx创建的单号是多少
+# 8. 业务前台xx建的单号是多少
+# doc = '业务前台'
+# tri = pd.read_csv(_path+doc+'.txt', sep='\t', header=None, names=['s', 'p', 'o','stype', 'otype']
+#                   , encoding='utf-8', dtype=np.str)
+# qes = ['xx创建的工单号是多少', 'xx建的工单号是多少', 'xx创建的单号是多少', 'xx建的单号是多少', '业务前台xx创建的工单号是多少'
+#        , '业务前台xx建的工单号是多少', '业务前台xx创建的单号是多少', '业务前台xx建的单号是多少']
+# tri = tri.sample(frac=1.0)
+# tri['qes']=None
+# tri_n = tri.copy()
+# tri_n = annotate(tri_n, qes)
+# print(len(tri))
+# print(len(tri_n))
+# tri_n.to_csv(_path_o+doc+'noted.txt', sep='\t', header=False,index=False, encoding='utf_8_sig')
+
+# 仓储人员
+# print(tri['otype'].unique()) # 出库单
+# 仓储人员 备货 出库单， 可能的问题：
+# 1. xx备货的出库单号是多少
+# 2. xx用哪个出库单备货
+# 3. xx备货用的出库单号是多少
+# 4. 仓储人员xx备货用的出库单号是多少
+# 5. 仓储人员xx用哪个出库单备货
+# 6. 仓储人员xx备货的出库单号是多少
+# qes = ['xx备货的出库单号是多少', 'xx用哪个出库单备货', 'xx备货用的出库单号是多少', '仓储人员xx备货用的出库单号是多少'
+#        , '仓储人员xx用哪个出库单备货', '仓储人员xx备货的出库单号是多少']
+# tri = tri.sample(frac=1.0)
+# tri['qes']=None
+# tri_n = tri.copy()
+# tri_n = annotate(tri_n, qes)
+# print(len(tri))
+# print(len(tri_n))
+# tri_n.to_csv(_path_o+'仓储人员noted.txt', sep='\t', header=False,index=False, encoding='utf_8_sig')
+
+# 出库单
+# print(tri['otype'].unique()) # 出库单
+# 出库单 包含 零件， 可能的问题：
+# 1. 出库单xx包含什么零件
+# 2. 出库单xx包含的零件是什么
+# 3. 出库单xx有什么零件
+# 4. 出库单xx含有什么零件
+# 5. 出库单xx含有的零件是什么
+# 6. xx包含什么零件
+# 7 xx包含的零件是什么
+# 8. xx有什么零件
+# 9. xx含有什么零件
+# 10. xx含有的零件是什么
+# qes = ['出库单xx包含什么零件', '出库单xx包含的零件是什么', '出库单xx有什么零件', '出库单xx含有什么零件', '出库单xx含有的零件是什么'
+#        , 'xx包含什么零件', 'xx包含的零件是什么', 'xx有什么零件', 'xx含有什么零件', 'xx含有的零件是什么']
+# tri = tri.sample(frac=1.0)
+# tri['qes']=None
+# tri_n = tri.copy()
+# tri_n = annotate(tri_n, qes)
+# print(len(tri))
+# print(len(tri_n))
+# tri_n.to_csv(_path_o+'出库单noted.txt', sep='\t', header=False,index=False, encoding='utf_8_sig')

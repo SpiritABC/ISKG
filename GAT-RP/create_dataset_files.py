@@ -1,7 +1,8 @@
 import numpy as np
 
-# 
-def getID(folder='data/umls/'):
+# getID: use train/valid/test.txt to create entity2id/relation2id.txt, making entity&relation unique
+# train/valid/test_marked.txt just copy train/valid/test.txt
+def getID(folder='data/ISKG/'):
     lstEnts = {}
     lstRels = {}
     with open(folder + 'train.txt') as f, open(folder + 'train_marked.txt', 'w') as f2:
@@ -11,9 +12,9 @@ def getID(folder='data/umls/'):
             line = [i.strip() for i in line]
             # print(line[0], line[1], line[2])
             if line[0] not in lstEnts:
-                lstEnts[line[0]] = len(lstEnts)
+                lstEnts[line[0]] = len(lstEnts) # so that entity unique id: 0, 1, 2, ..., n
             if line[1] not in lstRels:
-                lstRels[line[1]] = len(lstRels)
+                lstRels[line[1]] = len(lstRels) # so that relation unique id: 0, 1, 2, ..., m
             if line[2] not in lstEnts:
                 lstEnts[line[2]] = len(lstEnts)
             count += 1
